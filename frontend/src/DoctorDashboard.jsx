@@ -69,11 +69,19 @@ const DoctorDashboard = () => {
                     <h3 className="text-xl font-semibold mb-3 text-green-700">Decrypted Records File List</h3>
                     <ul className="space-y-3">
                         {records.map((rec, i) => (
-                            <li key={i} className="bg-green-50 p-4 rounded border border-green-200">
-                                <span className="font-bold text-green-900">{rec.recordType}</span>
-                                <div className="text-sm font-mono mt-1 break-all text-gray-700">
-                                    IPFS Hash: {rec.ipfsHash} <span className="text-green-600 ml-2">(Decrypted Ready)</span>
+                            <li key={i} className="flex justify-between items-center bg-green-50 p-4 rounded border border-green-200">
+                                <div>
+                                    <span className="font-bold text-green-900">{rec.recordType}</span>
+                                    <div className="text-sm font-mono mt-1 break-all text-gray-700">
+                                        IPFS Hash: {rec.ipfsHash} <span className="text-green-600 ml-2">(Decrypted Ready)</span>
+                                    </div>
                                 </div>
+                                <a
+                                    href={`http://localhost:8080/api/records/download/${rec.ipfsHash}`}
+                                    className="px-4 py-2 bg-green-600 text-white rounded font-medium hover:bg-green-700 transition"
+                                    download>
+                                    Download
+                                </a>
                             </li>
                         ))}
                     </ul>

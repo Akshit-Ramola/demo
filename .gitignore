@@ -27,3 +27,11 @@ frontend/dist-ssr/
 # OS
 .DS_Store
 Thumbs.db
+node_modules
+
+# Env & Logs
+.env
+*.log
+*.txt
+artifacts/
+cache/

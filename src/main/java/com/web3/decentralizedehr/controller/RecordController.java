@@ -25,15 +25,14 @@ public class RecordController {
         try {
             // 1. Encrypt file (AES-256) and Upload to IPFS via Pinata
             String ipfsHash = ipfsService.encryptAndUpload(file);
-            
+
             // 2. Add Hash & Metadata to the Polygon/Local Blockchain
             String txHash = blockchainService.addRecord(patientAddress, ipfsHash, recordType);
-            
+
             return ResponseEntity.ok(Map.of(
                     "message", "EHR Record encrypted and saved successfully",
                     "ipfsHash", ipfsHash,
-                    "transactionHash", txHash
-            ));
+                    "transactionHash", txHash));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
         }
@@ -49,8 +48,25 @@ public class RecordController {
             // Web3j typically wraps contract revert errors
             return ResponseEntity.status(403).body(Map.of(
                     "error", "Access Denied or Not Authorized",
-                    "details", e.getMessage()
-            ));
+                    "details", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/download/{ipfsHash}")
+    public ResponseEntity<org.springframework.core.io.Resource> downloadRecord(@PathVariable String ipfsHash) {
+        try {
+            byte[] decryptedData = ipfsService.downloadAndDecrypt(ipfsHash);
+            org.springframework.core.io.ByteArrayResource resource = new org.springframework.core.io.ByteArrayResource(
+                    decryptedData);
+
+            return ResponseEntity.ok()
+                    .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION,
+                            "attachment; filename=\"record-" + ipfsHash + ".txt\"")
+                    .contentType(org.springframework.http.MediaType.APPLICATION_OCTET_STREAM)
+                    .contentLength(decryptedData.length)
+                    .body(resource);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
         }
     }
 }
